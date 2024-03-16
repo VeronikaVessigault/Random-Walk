@@ -12,11 +12,13 @@
   <label for="steps">Steps:</label><br>
   <input type="text" id="steps" name="steps" value="1000"><br><br>
   <input type="submit" value="Run Visualization">
-</form> 
+  {% with steps=steps, dim=dim %}
+    {% include error_message %}
+  {% endwith %}
+</form>
 
-<br>
 
-<h1>Past 10 Visualizations</h1>
+<h3>Past 10 Visualizations</h3>
 <div class="row">
   <div class="column"><img src="upload/walk0.gif" alt="GIF Visualization"/></div>s
   <div class="column"><img src="upload/walk1.gif" alt="GIF Visualization"/></div>

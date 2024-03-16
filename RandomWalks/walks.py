@@ -1,5 +1,6 @@
 from random import SystemRandom
-from re import T
+from celery import Celery
+
 cryto_gen_num = SystemRandom()
 
 import os
@@ -64,7 +65,7 @@ def set_dict_csv(filename, mydict):
 
 def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
     # checks if dimension and steps inputted is valid
-    if dimension > 0 and steps > 199 and steps < 15001:
+    if dimension > 0 and steps > 9 and steps < 15001:
         if not animated:
             # if defined_start isn't defined, set it to origin
             if not defined_start:
@@ -162,13 +163,12 @@ def many_walks(dimension, steps, runs_to_complete):
     if runs_to_complete > 0:
         valid_keys_by_steps = get_list_csv("valid_keys_by_steps")
         #valid_keys_by_dimension = get_list_csv("valid_keys_by_dimension")
-        
+
         if (dimension, steps) in valid_keys_by_steps:
             for i in range(0, runs_to_complete):
                 total_runs_one, total_recurrent_runs_one, new_magnitude, _ = run_walk(dimension, steps, animated = False)
 
                 average_magnitude_by_dimension = get_dict_csv("average_magnitude_by_dimension")
-                print(average_magnitude_by_dimension)
                 total_runs_by_dimension = get_dict_csv("total_runs_by_dimension")
                 try:
                     old_avg_mag_by_dim = float(average_magnitude_by_dimension[str(dimension)])*float(total_runs_by_dimension[str(dimension)])
@@ -190,7 +190,6 @@ def many_walks(dimension, steps, runs_to_complete):
 
 
                 average_magnitude_by_steps = get_dict_csv("average_magnitude_by_steps")
-                print(average_magnitude_by_steps)
                 total_runs_by_steps = get_dict_csv("total_runs_by_steps")
                 try:
                     old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
@@ -234,12 +233,10 @@ def animate_2d(steps):
     valid_keys_by_dimension = get_list_csv("valid_keys_by_dimension")
 
     if (dimension, steps) in valid_keys_by_steps:
-        print("valid step key")
         total_runs_one, total_recurrent_runs_one, new_magnitude, animation_steps = run_walk(dimension, steps, animated = True)
 
 
         average_magnitude_by_dimension = get_dict_csv("average_magnitude_by_dimension")
-        print(average_magnitude_by_dimension)
         total_runs_by_dimension = get_dict_csv("total_runs_by_dimension")
         try:
             old_avg_mag_by_dim = float(average_magnitude_by_dimension[str(dimension)])*float(total_runs_by_dimension[str(dimension)])
@@ -261,7 +258,6 @@ def animate_2d(steps):
 
 
         average_magnitude_by_steps = get_dict_csv("average_magnitude_by_steps")
-        print(average_magnitude_by_steps)
         total_runs_by_steps = get_dict_csv("total_runs_by_steps")
         try:
             old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
@@ -289,10 +285,8 @@ def animate_2d(steps):
         fig, ax = plt.subplots(figsize=(4, 3), dpi=880/4)
 
         if total_recurrent_runs_one:
-            print(total_recurrent_runs_one)
             line, = ax.plot(x, y, color='g')
         elif not total_recurrent_runs_one:
-            print(total_recurrent_runs_one)
             line, = ax.plot(x, y, color='r')
 
         plt.axhline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
@@ -368,10 +362,8 @@ def animate_2d(steps):
         fig, ax = plt.subplots(figsize=(4, 3), dpi=880/4)
 
         if total_recurrent_runs_one:
-            print(total_recurrent_runs_one)
             line, = ax.plot(x, y, color='g')
         elif not total_recurrent_runs_one:
-            print(total_recurrent_runs_one)
             line, = ax.plot(x, y, color='r')
 
         plt.axhline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
