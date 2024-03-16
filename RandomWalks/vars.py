@@ -1,6 +1,6 @@
 # Tally
 global valid_keys_by_steps
-valid_keys_by_steps = [(i,j) for i in range(1,6) for j in range(500,7501,500)] # (dimension, steps)
+valid_keys_by_steps = [(i,j) for i in range(1,6) for j in range(200,7501,100)] # (dimension, steps)
 global valid_keys_by_dimension
 valid_keys_by_dimension = [i for i in range(1,6)]
 

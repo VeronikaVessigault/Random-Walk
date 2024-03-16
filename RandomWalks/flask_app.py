@@ -38,11 +38,31 @@ def visual_para():
     if request.method == 'POST':
         dim = request.form['dim']
         steps = request.form['steps']
-        if "2" == str(dim):
+        if "2" == str(dim) and int(steps)>199 and int(steps)<15001:
+            return redirect(url_for(".loading", steps=steps))
             walks.animate_2d(int(steps))
             return redirect('/visualization')
+        elif not ("2" == str(dim)) and (int(steps)<199 or int(steps)>15001):
+            return render_template("random_walk_viz.html", error_message = "error_message_dim_and_steps_viz.html", steps = steps, dim = dim)
+        elif (int(steps)<199 or int(steps)>15001):
+            return render_template("random_walk_viz.html", error_message = "error_message_steps_viz.html", steps = steps)
+        elif not "2" == str(dim):
+            return render_template("random_walk_viz.html", error_message = "error_message_dim_viz.html", dim = dim)
     else:
-        return render_template("random_walk_viz.html")
+        return render_template("random_walk_viz.html", error_message = "empty.html")
+    
+@app.route('/loading', methods=["GET"])
+def loading():
+    try:
+        steps = request.args.get("steps") 
+    except:
+        steps = -1
+        
+    if request.method == "GET":
+        if int(steps)>199 and int(steps)<15001:
+            walks.animate_2d(int(steps))
+            return redirect("/visualization")
+    return render_template("loading.html")
 
 
 @app.route('/visualization', methods=["GET"])

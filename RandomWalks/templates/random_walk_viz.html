@@ -2,7 +2,7 @@
 <html>
 <body>
 
-<h2>Random Walk w/ Visualization</h2>
+<h1>Random Walk w/ Visualization</h1>
 <p>Current support for requests of dimension 2 and any # of steps between 200 and 15000 inclusive.</p> 
 <p>Also note that the line color will be green to indicate that the path returned to the origin of the walk and red to idicate the path never returned.</p>
 
@@ -12,11 +12,13 @@
   <label for="steps">Steps:</label><br>
   <input type="text" id="steps" name="steps" value="1000"><br><br>
   <input type="submit" value="Run Visualization">
+  {% with steps=steps, dim=dim %}
+    {% include error_message %}
+  {% endwith %}
 </form> 
 
-<br>
 
-<h1>Past 10 Visualizations</h1>
+<h2>Past 10 Visualizations</h2>
 <div class="row">
   <div class="column"><img src="upload/walk0.gif" alt="GIF Visualization"/></div>s
   <div class="column"><img src="upload/walk1.gif" alt="GIF Visualization"/></div>
