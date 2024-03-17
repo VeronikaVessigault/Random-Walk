@@ -1,5 +1,4 @@
 from random import SystemRandom
-from celery import Celery
 
 cryto_gen_num = SystemRandom()
 
