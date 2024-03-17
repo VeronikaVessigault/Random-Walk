@@ -11,6 +11,21 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 polyas_constants = ["100%","100%","34.0537%","19.3206%","13.5178%","10.4715%","8.58449%","7.29126%"]
 
+def format_vectors_for_stats_temp(dim, ending_vecs):
+    vectors = []
+    each_line = (10-int(dim)//2)
+    remainder = len(ending_vecs) % each_line
+    for i in range(len(ending_vecs)//(each_line)):
+        string = ""
+        for j in range(each_line):
+            string += str(ending_vecs[i*each_line+j]) + ", "
+        vectors.append(string[:-2])
+    last_entry = ""
+    for i in range(remainder,0,-1):
+        last_entry += str(ending_vecs[i*-1]) + ", "
+    last_entry = last_entry[:-2]
+    return vectors
+
 @app.after_request
 def add_header(r):
     """
@@ -87,24 +102,18 @@ def bulk_random_walk():
         #walks.set_valid_keys_by_dimension()
 
         allowed_dim = [1,2,3,4,5,6,7,8]
-        if int(dim) in allowed_dim and int(steps)>199 and int(steps)<15001 and int(runs) > 0 and int(runs) < 25001:
+        if int(dim) in allowed_dim and int(steps)>199 and int(steps)<15001 and int(runs) > 0 and int(runs) < 100001:
             if int(steps) < 7501 and int(steps) % 100 == 0:
                 ending_vecs, how_many_rec = walks.many_walks(int(dim), int(steps), int(runs))
+                #print(ending_vecs)
                 percent_rec = str(round(how_many_rec/int(runs)*100,4)) + "%"
-                vectors = []
-                remainder = len(ending_vecs) % 7
-                for i in range(len(ending_vecs)//7):
-                    vectors.append(str(ending_vecs[i*7]) + ", " + str(ending_vecs[i*7+1]) + ", " + str(ending_vecs[i*7+2]) + ", " + str(ending_vecs[i*7+3]) + ", " + str(ending_vecs[i*7+4]) + ", " + str(ending_vecs[i*7+5]) + ", " + str(ending_vecs[i*7+6]))
-                last_entry = ""
-                for i in range(remainder,0,-1):
-                    last_entry += str(ending_vecs[i*-1]) + ", "
-                last_entry = last_entry[:-2]
-                vectors.append(last_entry)
+                vectors = format_vectors_for_stats_temp(dim, ending_vecs)
                 return render_template('random_walk_bulk_w_stats.html', vectors = vectors, how_many_rec = how_many_rec, percent_rec = percent_rec, dim = dim, steps = steps, runs = runs, polyas = polyas_constants[int(dim)-1])
-            elif int(steps) < 15001 and int(steps) % 500 == 0:
+            elif int(steps) % 500 == 0:
                 ending_vecs, how_many_rec = walks.many_walks(int(dim), int(steps), int(runs))
                 percent_rec = str(round(how_many_rec/int(runs)*100,4)) + "%"
-                return render_template('random_walk_bulk_w_stats.html', ending_vecs = ending_vecs, how_many_rec = how_many_rec, percent_rec = percent_rec, dim = dim, steps = steps, runs = runs, polyas = polyas_constants[int(dim)-1])
+                vectors = format_vectors_for_stats_temp(dim, ending_vecs)
+                return render_template('random_walk_bulk_w_stats.html', vectors = vectors, how_many_rec = how_many_rec, percent_rec = percent_rec, dim = dim, steps = steps, runs = runs, polyas = polyas_constants[int(dim)-1])
         else:    
             dim_right = False
             steps_right = False

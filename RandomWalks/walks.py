@@ -69,18 +69,27 @@ def get_and_set_percent_recurrent_by_steps():
     percent_rec_dict = dict()
     for key in valid_keys:
         try:
+            #print(key)
             percent_rec = str(float(mydict_rec[str(key)])/float(mydict_total[str(key)])*100) + "%"
         except ZeroDivisionError:
             percent_rec = "N/A"
+        except KeyError:
+            try:
+                percent_rec = str(float(mydict_rec[key])/float(mydict_total[key])*100) + "%"
+            except ZeroDivisionError:
+                percent_rec = "N/A"
         percent_rec_dict[str(key)] = percent_rec
     set_dict_csv("percent_recurrent_by_steps", percent_rec_dict)
     return percent_rec_dict
 
 
 def set_valid_keys_by_steps():
-    valid_keys_by_steps = [(i,j) for i in range(1,9) for j in range(200,7501,100)]
-    valid_keys_by_steps_1 = [(i,j) for i in range(1,9) for j in range(8000,15001,500)]
-    valid_keys_by_steps.extend(valid_keys_by_steps_1)
+    valid_keys_by_steps = []
+    for i in range(1,9):
+        valid_keys_by_steps_1 = [(i,j) for j in range(200,7501,100)]
+        valid_keys_by_steps_2 = [(i,j) for j in range(8000,15001,500)]
+        valid_keys_by_steps.extend(valid_keys_by_steps_1)
+        valid_keys_by_steps.extend(valid_keys_by_steps_2)
     set_list_csv("valid_keys_by_steps", valid_keys_by_steps)
 
 def set_valid_keys_by_dimension():
@@ -118,7 +127,6 @@ def get_dict_csv(filename):
             reader = csv.reader(csv_file)
             mydict = dict(reader)
             return mydict
-    return dict()
 
 def set_dict_csv(filename, mydict):
     file_list = ["total_runs_by_steps", "total_recurrent_runs_by_steps", "average_magnitude_by_steps", "percent_recurrent_by_steps",
@@ -174,7 +182,7 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
             #print(walk)
             #print(magnitude)
             
-            return 1, int(recurrent), magnitude, walk
+            return 1, int(recurrent), magnitude, walk.copy()
         else:
             animation_steps = []
             
@@ -215,8 +223,8 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
             # calculate magnitude of walk from origin
             magnitude = 0
             for element in walk:
-                magnitude += element
-            magnitude /= dimension
+                magnitude += element**2
+            magnitude = magnitude**(1/2)
             
             #print(walk)
             #print(magnitude)
@@ -235,26 +243,29 @@ def many_walks(dimension, steps, runs_to_complete):
 
         if (dimension, steps) in valid_keys_by_steps:
             for i in range(0, runs_to_complete):
+                if i % 1000 == 0 :
+                    print("Starting on run " + str(i) + " of " + str(runs_to_complete) + ".")
                 total_runs_one, total_recurrent_runs_one, new_magnitude, final_vec = run_walk(dimension, steps, animated = False)
-                final_vecs.append(final_vec)
+                final_vecs.append(final_vec.copy())
                 recurrent_count += total_recurrent_runs_one
 
                 average_magnitude_by_dimension = get_dict_csv("average_magnitude_by_dimension")
                 total_runs_by_dimension = get_dict_csv("total_runs_by_dimension")
-                try:
-                    old_avg_mag_by_dim = float(average_magnitude_by_dimension[str(dimension)])*float(total_runs_by_dimension[str(dimension)])
-                except KeyError:
-                    average_magnitude_by_dimension[str(dimension)] = 0
-                    total_runs_by_dimension[str(dimension)] = 0
-                    old_avg_mag_by_dim = 0
+                #try:
+                old_avg_mag_by_dim = float(average_magnitude_by_dimension[str(dimension)])*float(total_runs_by_dimension[str(dimension)])
+                #except KeyError:
+                #    average_magnitude_by_dimension[str(dimension)] = 0
+                #    total_runs_by_dimension[str(dimension)] = 0
+                #    old_avg_mag_by_dim = 0
                 total_runs_by_dimension[str(dimension)] = float(total_runs_by_dimension[str(dimension)]) + total_runs_one
                 set_dict_csv("total_runs_by_dimension", total_runs_by_dimension)
                 total_recurrent_runs_by_dimension = get_dict_csv("total_recurrent_runs_by_dimension")
-                try:
-                    total_recurrent_runs_by_dimension[str(dimension)] = float(total_recurrent_runs_by_dimension[str(dimension)]) + total_recurrent_runs_one
-                except KeyError:
-                    total_recurrent_runs_by_dimension[str(dimension)] = 0
-                    total_recurrent_runs_by_dimension[str(dimension)] = float(total_recurrent_runs_by_dimension[str(dimension)]) + total_recurrent_runs_one
+                #try:
+                total_recurrent_runs_by_dimension[str(dimension)] = float(total_recurrent_runs_by_dimension[str(dimension)]) + total_recurrent_runs_one
+                
+                #except KeyError:
+                #    total_recurrent_runs_by_dimension[str(dimension)] = 0
+                #    total_recurrent_runs_by_dimension[str(dimension)] = float(total_recurrent_runs_by_dimension[str(dimension)]) + total_recurrent_runs_one
                 set_dict_csv("total_recurrent_runs_by_dimension", total_recurrent_runs_by_dimension)
                 average_magnitude_by_dimension[str(dimension)] = (old_avg_mag_by_dim+new_magnitude)/total_runs_by_dimension[str(dimension)]
                 set_dict_csv("average_magnitude_by_dimension", average_magnitude_by_dimension)
@@ -262,20 +273,20 @@ def many_walks(dimension, steps, runs_to_complete):
 
                 average_magnitude_by_steps = get_dict_csv("average_magnitude_by_steps")
                 total_runs_by_steps = get_dict_csv("total_runs_by_steps")
-                try:
-                    old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
-                except KeyError:
-                    average_magnitude_by_steps[str((dimension, steps))] = 0
-                    total_runs_by_steps[str((dimension, steps))] = 0
-                    old_avg_mag_by_dim = 0
+                #try:
+                old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
+                #except KeyError:
+                #    average_magnitude_by_steps[str((dimension, steps))] = 0
+                #    total_runs_by_steps[str((dimension, steps))] = 0
+                #    old_avg_mag_by_dim = 0
                 total_runs_by_steps[str((dimension, steps))] = float(total_runs_by_steps[str((dimension, steps))]) + total_runs_one
                 set_dict_csv("total_runs_by_steps", total_runs_by_steps)
                 total_recurrent_runs_by_steps = get_dict_csv("total_recurrent_runs_by_steps")
-                try:
-                    total_recurrent_runs_by_steps[str((dimension, steps))] = float(total_recurrent_runs_by_steps[str((dimension, steps))]) + total_recurrent_runs_one
-                except KeyError:
-                    total_recurrent_runs_by_steps[str((dimension, steps))] = 0
-                    total_recurrent_runs_by_steps[str((dimension, steps))] += total_recurrent_runs_one
+                #try:
+                total_recurrent_runs_by_steps[str((dimension, steps))] = float(total_recurrent_runs_by_steps[str((dimension, steps))]) + total_recurrent_runs_one
+                #except KeyError:
+                #    total_recurrent_runs_by_steps[str((dimension, steps))] = 0
+                #    total_recurrent_runs_by_steps[str((dimension, steps))] += total_recurrent_runs_one
                 set_dict_csv("total_recurrent_runs_by_steps", total_recurrent_runs_by_steps)
                 average_magnitude_by_steps[str((dimension, steps))] = (old_avg_mag_by_dim+new_magnitude)/total_runs_by_steps[str((dimension, steps))]
                 set_dict_csv("average_magnitude_by_steps", average_magnitude_by_steps)
@@ -332,12 +343,12 @@ def animate_2d(steps):
 
         average_magnitude_by_steps = get_dict_csv("average_magnitude_by_steps")
         total_runs_by_steps = get_dict_csv("total_runs_by_steps")
-        try:
-            old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
-        except KeyError:
-            average_magnitude_by_steps[str((dimension, steps))] = 0
-            total_runs_by_steps[str((dimension, steps))] = 0
-            old_avg_mag_by_dim = 0
+        #try:
+        old_avg_mag_by_dim = float(average_magnitude_by_steps[str((dimension, steps))])*float(total_runs_by_steps[str((dimension, steps))])
+        #except KeyError:
+        #    average_magnitude_by_steps[str((dimension, steps))] = 0
+        #    total_runs_by_steps[str((dimension, steps))] = 0
+        #    old_avg_mag_by_dim = 0
         total_runs_by_steps[str((dimension, steps))] = float(total_runs_by_steps[str((dimension, steps))]) + total_runs_one
         set_dict_csv("total_runs_by_steps", total_runs_by_steps)
         total_recurrent_runs_by_steps = get_dict_csv("total_recurrent_runs_by_steps")
@@ -361,18 +372,60 @@ def animate_2d(steps):
             line, = ax.plot(x, y, color='g')
         elif not total_recurrent_runs_one:
             line, = ax.plot(x, y, color='r')
+        
+        line.axes.axis([min(x)-5, max(x)+5, min(y)-5, max(y)+5])
 
         plt.axhline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
         plt.axvline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
         plt.title("{} steps in {}-D Random Walk".format(steps, 2))
+        
+        blit = True
+        interval = 25
 
-        def update(num, x, y, line):
-            line.set_data(x[:num], y[:num])
-            line.axes.axis([min(x)-5, max(x)+5, min(y)-5, max(y)+5])
-            return line,
+        if steps < 701: 
+            def update(num, x, y, line):
+                line.set_data(x[:num], y[:num])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x), fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        elif steps < 2000:
+            def update(num, x, y, line):
+                line.set_data(x[:num*2], y[:num*2])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//2, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        elif steps < 4000:
+            def update(num, x, y, line):
+                line.set_data(x[:num*3], y[:num*3])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//3-1, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        elif steps < 6000:
+            def update(num, x, y, line):
+                line.set_data(x[:num*4], y[:num*4])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//4-1, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        elif steps < 8000:
+            def update(num, x, y, line):
+                line.set_data(x[:num*5], y[:num*5])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//5-1, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        elif steps < 10000:
+            def update(num, x, y, line):
+                line.set_data(x[:num*6], y[:num*6])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//6-1, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
+        else:
+            def update(num, x, y, line):
+                line.set_data(x[:num*8], y[:num*8])
+                return line,
+            ani = animation.FuncAnimation(fig, update, len(x)//8-1, fargs=[x, y, line],
+                                      interval=interval, blit=blit)
 
-        ani = animation.FuncAnimation(fig, update, len(x), fargs=[x, y, line],
-                                      interval=25, blit=False)
+
         ani.save('upload/new_walk.gif')
 
         if os.path.isfile("upload/new_walk.gif"):
@@ -437,14 +490,15 @@ def animate_2d(steps):
             line, = ax.plot(x, y, color='g')
         elif not total_recurrent_runs_one:
             line, = ax.plot(x, y, color='r')
+        
+        line.axes.axis([min(x)-5, max(x)+5, min(y)-5, max(y)+5])
 
         plt.axhline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
         plt.axvline(0, color='grey', alpha = 0.25, dashes = [0,0,1])
         plt.title("{} steps in {}-D Random Walk".format(steps, 2))
-
+        
         def update(num, x, y, line):
             line.set_data(x[:num], y[:num])
-            line.axes.axis([min(x)-5, max(x)+5, min(y)-5, max(y)+5])
             return line,
 
         ani = animation.FuncAnimation(fig, update, len(x), fargs=[x, y, line],
