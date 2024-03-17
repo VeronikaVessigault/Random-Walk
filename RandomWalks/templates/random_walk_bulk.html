@@ -4,14 +4,28 @@
 
 <h2>Bulk Random Walk</h2>
 
+<p>All statistics of the runs you choose to do will be provided to you once they are completed.<br>
+  Those statistics will then be added to the <a href="/total-statistics" >total statistics page</a>.</p>
+
+<p style="color: rgb(240, 110, 210)">Please carefully review the allowed inputs below.<br>
+  1. Random Walks for dimensions 1, 2, 3, 4, 5, 6, 7, and 8 are supported.<br>
+  2. The number of steps should be an integer either (between 200 and 7500 inclusive AND divisible by 100) OR (between 7500 and 15000 inclusive AND divisible by 500).<br>
+  3. The number of walks should be an integer between 1 and 25000 inclusive.
+</p>
+
 <form method="POST">
   <label for="dim">Dimension:</label><br>
   <input type="text" id="dim" name="dim" value="3"><br>
   <label for="steps">Steps:</label><br>
   <input type="text" id="steps" name="steps" value="2500"><br>
-  <label for="runs">Number of Runs:</label><br>
-  <input type="text" id="runs" name="runs" value="2000"><br><br>
+  <label for="runs">Number of Walks:</label><br>
+  <input type="text" id="runs" name="number of walks" value="2000"><br>
+  <p style="color: rgb(205, 0, 0)">Please click the button only once, and wait for the statistics to show.<br>
+    For large number of runs and steps this can take 1-5 minutes.</p>
   <input type="submit" value="Run Bulk Walks">
+  {% with steps=steps, dim=dim, runs=runs %}
+    {% include error_message %}
+  {% endwith %}
 </form> 
 
 </body>

@@ -1,23 +1,19 @@
 <!DOCTYPE html>
 <html>
 <body>
-
-<h2>Statistics</h2>
+  <form action="/total-statistics">
+    <input type="submit" value="See Statistics of All Runs Ever">
+  </form><br>
+  <form action="/bulk-random-walk">
+    <input type="submit" value="Run Another Set of Bulk Walks">
+  </form> 
+<h2>Statistics From Bulk Runs</h2>
 <p>These are the statistics for the {{runs}} runs of {{dim}}-D random walks with {{steps}} steps you just ran.</p>
-
-
-<h3>Run More Bulk Random Walks<h3>
-<form method="POST">
-  <label for="dim">Dimension:</label><br>
-  <input type="text" id="dim" name="dim" value="3"><br>
-  <label for="steps">Steps:</label><br>
-  <input type="text" id="steps" name="steps" value="2500"><br>
-  <label for="runs">Number of Runs:</label><br>
-  <input type="text" id="runs" name="runs" value="2000"><br><br>
-  <input type="submit" value="Run Another Batch of Bulk Walks">
-</form> 
-
-<p>placeholder text.</p>
+<p>Out of the {{runs}} runs, {{how_many_rec}} where recurrent. So {{percent_rec}} of the runs were recurrent compared to Polya's Random Walk Constant which estimates that {{polyas}} will be recurrent.</p>
+<h3>Ending position of each of the {{runs}} runs.</h3>  
+  {% for vector_list in vectors %}
+      <p>{{ vector_list }} </p>
+  {% endfor %}
 
 </body>
 </html>

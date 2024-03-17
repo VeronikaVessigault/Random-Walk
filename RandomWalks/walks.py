@@ -1,4 +1,5 @@
 from random import SystemRandom
+from celery import Celery
 
 cryto_gen_num = SystemRandom()
 
@@ -18,6 +19,74 @@ def add_stats(valid_keys_by_steps = False, valid_keys_by_dimension = False, tota
               total_recurrent_runs_by_steps = False, average_magnitude_by_steps = False, total_runs_by_dimension = False,
               total_recurrent_runs_by_dimension = False, average_magnitude_by_dimension = False, percent_recurrent = False):
     print("oops")
+
+def set_all_steps_dim_to_zero():
+    valid_keys = get_list_csv("valid_keys_by_steps")
+    avg_mag_dict = dict()
+    total_runs_dict = dict()
+    rec_runs_dict = dict()
+    for key in valid_keys:
+        avg_mag_dict[key] = 0
+        total_runs_dict[key] = 0 
+        rec_runs_dict[key] = 0
+    set_dict_csv("average_magnitude_by_steps", avg_mag_dict)
+    set_dict_csv("total_runs_by_steps", total_runs_dict)
+    set_dict_csv("total_recurrent_runs_by_steps", rec_runs_dict)
+
+def set_all_dim_to_zero():
+    valid_keys = get_list_csv("valid_keys_by_dimension")
+    avg_mag_dict = dict()
+    total_runs_dict = dict()
+    rec_runs_dict = dict()
+    for key in valid_keys:
+        avg_mag_dict[key] = 0
+        total_runs_dict[key] = 0 
+        rec_runs_dict[key] = 0
+    set_dict_csv("average_magnitude_by_dimension", avg_mag_dict)
+    set_dict_csv("total_runs_by_dimension", total_runs_dict)
+    set_dict_csv("total_recurrent_runs_by_dimension", rec_runs_dict)
+
+def get_and_set_percent_recurrent_by_dimension():
+    file_list = ["percent_recurrent_by_dimension"]
+    mydict_rec = get_dict_csv("total_recurrent_runs_by_dimension")
+    mydict_total = get_dict_csv("total_runs_by_dimension")
+    valid_keys = get_list_csv("valid_keys_by_dimension")
+    percent_rec_dict = dict()
+    for dim in valid_keys:
+        try:
+            percent_rec = str(round(float(mydict_rec[str(dim)])/float(mydict_total[str(dim)])*100,4)) + "%"
+        except ZeroDivisionError:
+            percent_rec = "N/A"
+        percent_rec_dict[str(dim)] = percent_rec
+    set_dict_csv("percent_recurrent_by_dimension", percent_rec_dict)
+    return percent_rec_dict
+
+
+def get_and_set_percent_recurrent_by_steps():
+    file_list = ["percent_recurrent_by_steps"]
+    mydict_rec = get_dict_csv("total_recurrent_runs_by_steps")
+    mydict_total = get_dict_csv("total_runs_by_steps")
+    valid_keys = get_list_csv("valid_keys_by_steps")
+    percent_rec_dict = dict()
+    for key in valid_keys:
+        try:
+            percent_rec = str(float(mydict_rec[str(key)])/float(mydict_total[str(key)])*100) + "%"
+        except ZeroDivisionError:
+            percent_rec = "N/A"
+        percent_rec_dict[str(key)] = percent_rec
+    set_dict_csv("percent_recurrent_by_steps", percent_rec_dict)
+    return percent_rec_dict
+
+
+def set_valid_keys_by_steps():
+    valid_keys_by_steps = [(i,j) for i in range(1,9) for j in range(200,7501,100)]
+    valid_keys_by_steps_1 = [(i,j) for i in range(1,9) for j in range(8000,15001,500)]
+    valid_keys_by_steps.extend(valid_keys_by_steps_1)
+    set_list_csv("valid_keys_by_steps", valid_keys_by_steps)
+
+def set_valid_keys_by_dimension():
+    valid_keys_by_dimension = [i for i in range(1,9)]
+    set_list_csv("valid_keys_by_dimension", valid_keys_by_dimension)
 
 
 def get_list_csv(filename):
@@ -43,8 +112,8 @@ def set_list_csv(filename, mylist):
 
 
 def get_dict_csv(filename):
-    file_list = ["total_runs_by_steps", "total_recurrent_runs_by_steps", "average_magnitude_by_steps", "total_runs_by_dimension",
-                 "total_recurrent_runs_by_dimension", "average_magnitude_by_dimension", "percent_recurrent_by_dimension"]
+    file_list = ["total_runs_by_steps", "total_recurrent_runs_by_steps", "average_magnitude_by_steps", "percent_recurrent_by_steps",
+                 "total_runs_by_dimension", "total_recurrent_runs_by_dimension", "average_magnitude_by_dimension", "percent_recurrent_by_dimension"]
     if os.path.isfile("{}.csv".format(filename)) and filename in file_list:
         with open('{}.csv'.format(filename)) as csv_file:
             reader = csv.reader(csv_file)
@@ -53,8 +122,8 @@ def get_dict_csv(filename):
     return dict()
 
 def set_dict_csv(filename, mydict):
-    file_list = ["total_runs_by_steps", "total_recurrent_runs_by_steps", "average_magnitude_by_steps", "total_runs_by_dimension",
-                 "total_recurrent_runs_by_dimension", "average_magnitude_by_dimension", "percent_recurrent_by_dimension"]
+    file_list = ["total_runs_by_steps", "total_recurrent_runs_by_steps", "average_magnitude_by_steps", "percent_recurrent_by_steps",
+                 "total_runs_by_dimension", "total_recurrent_runs_by_dimension", "average_magnitude_by_dimension", "percent_recurrent_by_dimension"]
     if os.path.isfile("{}.csv".format(filename)) and filename in file_list:
         with open('{}.csv'.format(filename), 'w') as csv_file:  
             writer = csv.writer(csv_file)
@@ -106,7 +175,7 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
             #print(walk)
             #print(magnitude)
             
-            return 1, int(recurrent), magnitude, False
+            return 1, int(recurrent), magnitude, walk
         else:
             animation_steps = []
             
@@ -159,13 +228,17 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
     
 
 def many_walks(dimension, steps, runs_to_complete):
+    final_vecs = []
+    recurrent_count = 0
     if runs_to_complete > 0:
         valid_keys_by_steps = get_list_csv("valid_keys_by_steps")
         #valid_keys_by_dimension = get_list_csv("valid_keys_by_dimension")
 
         if (dimension, steps) in valid_keys_by_steps:
             for i in range(0, runs_to_complete):
-                total_runs_one, total_recurrent_runs_one, new_magnitude, _ = run_walk(dimension, steps, animated = False)
+                total_runs_one, total_recurrent_runs_one, new_magnitude, final_vec = run_walk(dimension, steps, animated = False)
+                final_vecs.append(final_vec)
+                recurrent_count += total_recurrent_runs_one
 
                 average_magnitude_by_dimension = get_dict_csv("average_magnitude_by_dimension")
                 total_runs_by_dimension = get_dict_csv("total_runs_by_dimension")
@@ -207,6 +280,8 @@ def many_walks(dimension, steps, runs_to_complete):
                 set_dict_csv("total_recurrent_runs_by_steps", total_recurrent_runs_by_steps)
                 average_magnitude_by_steps[str((dimension, steps))] = (old_avg_mag_by_dim+new_magnitude)/total_runs_by_steps[str((dimension, steps))]
                 set_dict_csv("average_magnitude_by_steps", average_magnitude_by_steps)
+
+            return final_vecs, recurrent_count
 
         # only supporting valid dimension and step inputs
         #elif dimension in vars.valid_keys_by_dimension:
@@ -281,7 +356,7 @@ def animate_2d(steps):
             x.append(element[0])
             y.append(element[1])
 
-        fig, ax = plt.subplots(figsize=(4, 3), dpi=880/4)
+        fig, ax = plt.subplots(figsize=(4, 3), dpi=800/4)
 
         if total_recurrent_runs_one:
             line, = ax.plot(x, y, color='g')
@@ -330,35 +405,34 @@ def animate_2d(steps):
         #plt.show()
             
     elif dimension in valid_keys_by_dimension:
-        print("valid dim key")
         total_runs_one, total_recurrent_runs_one, new_magnitude, animation_steps = run_walk(dimension, steps, animated = True)
 
 
         average_magnitude_by_dimension = get_dict_csv("average_magnitude_by_dimension")
         total_runs_by_dimension = get_dict_csv("total_runs_by_dimension")
         try:
-            old_avg_mag_by_dim = average_magnitude_by_dimension[dimension]*total_runs_by_dimension[dimension]
+            old_avg_mag_by_dim = average_magnitude_by_dimension[str(dimension)]*total_runs_by_dimension[str(dimension)]
         except KeyError:
-            average_magnitude_by_dimension[dimension] = 0
-            total_runs_by_dimension[dimension] = 0
+            average_magnitude_by_dimension[str(dimension)] = 0
+            total_runs_by_dimension[str(dimension)] = 0
             old_avg_mag_by_dim = 0
-        total_runs_by_dimension[dimension] += total_runs_one
+        total_runs_by_dimension[str(dimension)] += total_runs_one
         set_dict_csv("total_runs_by_dimension", total_runs_by_dimension)
         total_recurrent_runs_by_dimension = get_dict_csv("total_recurrent_runs_by_dimension")
         try:
-            total_recurrent_runs_by_dimension[dimension] += total_recurrent_runs_one
+            total_recurrent_runs_by_dimension[str(dimension)] += total_recurrent_runs_one
         except KeyError:
-            total_recurrent_runs_by_dimension[dimension] = 0
-            total_recurrent_runs_by_dimension[dimension] += total_recurrent_runs_one
+            total_recurrent_runs_by_dimension[str(dimension)] = 0
+            total_recurrent_runs_by_dimension[str(dimension)] += total_recurrent_runs_one
         set_dict_csv("total_recurrent_runs_by_dimension", total_recurrent_runs_by_dimension)
-        average_magnitude_by_dimension[dimension] = (old_avg_mag_by_dim+new_magnitude)/total_runs_by_dimension[dimension]
+        average_magnitude_by_dimension[str(dimension)] = (old_avg_mag_by_dim+new_magnitude)/total_runs_by_dimension[str(dimension)]
         set_dict_csv("average_magnitude_by_dimension", average_magnitude_by_dimension)
         
         for element in animation_steps:
             x.append(element[0])
             y.append(element[1])
 
-        fig, ax = plt.subplots(figsize=(4, 3), dpi=880/4)
+        fig, ax = plt.subplots(figsize=(4, 3), dpi=800/4)
 
         if total_recurrent_runs_one:
             line, = ax.plot(x, y, color='g')

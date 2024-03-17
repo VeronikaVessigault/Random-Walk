@@ -1,19 +1,216 @@
 <!DOCTYPE html>
 <html>
 <body>
+  <style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+    </style>
+<h2>Total Statistics of All Runs Ever</h2>
 
-<h2>Total Statistics</h2>
+<h3>Statistics by Dimension</h3>
+<table>
+  <tr>
+    <th>Dimension</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for dim in dim_keys %}
+  <tr>
+    <td>{{dim}}</td>
+    <td>{{tot_runs_dim_dict[dim | string] | int}}</td>
+    <td>{{rec_runs_dim_dict[dim | string] | int}}</td>
+    <td>{{percent_rec_dim_dict[dim | string]}}</td>
+    <td>{{polyas[dim - 1]}}</td>
+    <td>{{avg_mag_dim_dict[dim | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
 
-<form action="/">
-  <label for="dim">Dimension:</label><br>
-  <input type="text" id="dim" name="dim" value="3"><br>
-  <label for="steps">Steps:</label><br>
-  <input type="text" id="steps" name="steps" value="2500"><br>
-  <label for="runs">Number of Runs:</label><br>
-  <input type="text" id="runs" name="runs" value="2000"><br><br>
-  <input type="submit" value="Run Bulk Walks">
-</form> 
-
+<h3>Statistics by Steps (and Dimension)</h3>
+<h4>Dimension 1</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[0] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[0]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 2</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[1] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[1]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 3</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[2] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[2]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 4</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[3] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[3]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 5</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[4] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[4]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 6</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[5] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[5]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 7</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[6] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[6]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
+<h4>Dimension 8</h4>
+<table>
+  <tr>
+    <th>Steps</th>
+    <th>Total Runs</th>
+    <th>Recurrent Runs</th>
+    <th>Percent Recurrent</th>
+    <th>Polya's Constant</th>
+    <th>Avg Ending Magnitude of Runs</th>
+  </tr>
+  {% for key in steps_keys_by_dim[7] %}
+  <tr>
+    <td>{{key[1]}}</td>
+    <td>{{tot_runs_steps_dict[key | string] | int}}</td>
+    <td>{{rec_runs_steps_dict[key | string] | int}}</td>
+    <td>{{percent_rec_steps_dict[key | string]}}</td>
+    <td>{{polyas[7]}}</td>
+    <td>{{avg_mag_steps_dict[key | string]}}</td>
+  </tr>
+  {% endfor %}
+</table>
 
 </body>
 </html>
