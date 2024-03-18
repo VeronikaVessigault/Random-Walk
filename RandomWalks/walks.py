@@ -176,8 +176,8 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
             # calculate magnitude of walk from origin
             magnitude = 0
             for element in walk:
-                magnitude += element
-            magnitude /= dimension
+                magnitude += element**2
+            magnitude = magnitude**(1/2)
             
             #print(walk)
             #print(magnitude)
@@ -235,6 +235,9 @@ def run_walk(dimension = 0, steps = 0, defined_start = False, animated = True):
     
 
 def many_walks(dimension, steps, runs_to_complete):
+    #dimension = int(dimension)
+    #steps = int(steps)
+    #runs_to_complete = int(runs_to_complete)
     final_vecs = []
     recurrent_count = 0
     if runs_to_complete > 0:
@@ -244,7 +247,7 @@ def many_walks(dimension, steps, runs_to_complete):
         if (dimension, steps) in valid_keys_by_steps:
             for i in range(0, runs_to_complete):
                 if i % 1000 == 0 :
-                    print("Starting on run " + str(i) + " of " + str(runs_to_complete) + ".")
+                    print("Starting on run " + str(i) + " of " + str(runs_to_complete) + " in dimension " + str(dimension) + " with " + str(steps) + "steps.")
                 total_runs_one, total_recurrent_runs_one, new_magnitude, final_vec = run_walk(dimension, steps, animated = False)
                 final_vecs.append(final_vec.copy())
                 recurrent_count += total_recurrent_runs_one
@@ -382,49 +385,32 @@ def animate_2d(steps):
         blit = True
         interval = 25
 
-        if steps < 701: 
-            def update(num, x, y, line):
-                line.set_data(x[:num], y[:num])
+        def update(num, x, y, line, jump):
+                line.set_data(x[:num*jump], y[:num*jump])
                 return line,
-            ani = animation.FuncAnimation(fig, update, len(x), fargs=[x, y, line],
+
+        if steps < 701: 
+            ani = animation.FuncAnimation(fig, update, len(x)//3-1, fargs=[x, y, line, 3],
                                       interval=interval, blit=blit)
         elif steps < 2000:
-            def update(num, x, y, line):
-                line.set_data(x[:num*2], y[:num*2])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//2, fargs=[x, y, line],
-                                      interval=interval, blit=blit)
+            ani = animation.FuncAnimation(fig, update, len(x)//4-1, fargs=[x, y, line, 4],
+                                      interval=interval, blit=blit)  
         elif steps < 4000:
-            def update(num, x, y, line):
-                line.set_data(x[:num*3], y[:num*3])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//3-1, fargs=[x, y, line],
+            ani = animation.FuncAnimation(fig, update, len(x)//5-1, fargs=[x, y, line, 5],
                                       interval=interval, blit=blit)
         elif steps < 6000:
-            def update(num, x, y, line):
-                line.set_data(x[:num*4], y[:num*4])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//4-1, fargs=[x, y, line],
+            ani = animation.FuncAnimation(fig, update, len(x)//6-1, fargs=[x, y, line, 6],
                                       interval=interval, blit=blit)
         elif steps < 8000:
-            def update(num, x, y, line):
-                line.set_data(x[:num*5], y[:num*5])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//5-1, fargs=[x, y, line],
+            ani = animation.FuncAnimation(fig, update, len(x)//8-1, fargs=[x, y, line, 8],
                                       interval=interval, blit=blit)
         elif steps < 10000:
-            def update(num, x, y, line):
-                line.set_data(x[:num*6], y[:num*6])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//6-1, fargs=[x, y, line],
+            ani = animation.FuncAnimation(fig, update, len(x)//10-1, fargs=[x, y, line, 10],
                                       interval=interval, blit=blit)
         else:
-            def update(num, x, y, line):
-                line.set_data(x[:num*8], y[:num*8])
-                return line,
-            ani = animation.FuncAnimation(fig, update, len(x)//8-1, fargs=[x, y, line],
+            ani = animation.FuncAnimation(fig, update, len(x)//12-1, fargs=[x, y, line, 12],
                                       interval=interval, blit=blit)
-
+        
 
         ani.save('upload/new_walk.gif')
 
