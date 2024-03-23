@@ -246,8 +246,8 @@ def many_walks(dimension, steps, runs_to_complete):
 
         if (dimension, steps) in valid_keys_by_steps:
             for i in range(0, runs_to_complete):
-                if i % 1000 == 0 :
-                    print("Starting on run " + str(i) + " of " + str(runs_to_complete) + " in dimension " + str(dimension) + " with " + str(steps) + "steps.")
+                if i % 250 == 0 :
+                    print("Starting on run " + str(i) + " of " + str(runs_to_complete) + " in dimension " + str(dimension) + " with " + str(steps) + " steps.")
                 total_runs_one, total_recurrent_runs_one, new_magnitude, final_vec = run_walk(dimension, steps, animated = False)
                 final_vecs.append(final_vec.copy())
                 recurrent_count += total_recurrent_runs_one

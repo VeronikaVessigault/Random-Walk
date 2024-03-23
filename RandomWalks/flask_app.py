@@ -142,17 +142,20 @@ def bulk_random_walk():
 
 @app.route('/total-statistics')
 def stats():
-    walks.set_valid_keys_by_steps()
-    walks.set_valid_keys_by_dimension()
-    walks.set_all_dim_to_zero()
-    walks.set_all_steps_dim_to_zero()
+    #walks.set_valid_keys_by_steps()
+    #walks.set_valid_keys_by_dimension()
+    #walks.set_all_dim_to_zero()
+    #walks.set_all_steps_dim_to_zero()
     dim_keys = walks.get_list_csv("valid_keys_by_dimension")
     dim_steps_keys = walks.get_list_csv("valid_keys_by_steps")
 
-    for key in dim_steps_keys:
-        #print(key[0], key[1]) # confirmed (str(dimension), str(step)) is key
-        walks.many_walks(int(key[0]),int(key[1]), 50000)
-
+    #for key in dim_steps_keys:
+    #    if int(key[0]) > 2:
+    #        #print(key[0], key[1]) # confirmed (str(dimension), str(step)) is key
+    #        if int(key[1])>10000: 
+    #            walks.many_walks(int(key[0]),int(key[1]), 250)
+    #        else:    
+    #            walks.many_walks(int(key[0]),int(key[1]), 500)
     percent_rec_dim_dict = walks.get_and_set_percent_recurrent_by_dimension()
     percent_rec_steps_dict = walks.get_and_set_percent_recurrent_by_steps()
     avg_mag_dim_dict = walks.get_dict_csv("average_magnitude_by_dimension")
