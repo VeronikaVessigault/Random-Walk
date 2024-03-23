@@ -70,12 +70,12 @@ def get_and_set_percent_recurrent_by_steps():
     for key in valid_keys:
         try:
             #print(key)
-            percent_rec = str(float(mydict_rec[str(key)])/float(mydict_total[str(key)])*100) + "%"
+            percent_rec = str(round(float(mydict_rec[str(key)])/float(mydict_total[str(key)])*100,4)) + "%"
         except ZeroDivisionError:
             percent_rec = "N/A"
         except KeyError:
             try:
-                percent_rec = str(float(mydict_rec[key])/float(mydict_total[key])*100) + "%"
+                percent_rec = str(round(float(mydict_rec[key])/float(mydict_total[key])*100,4)) + "%"
             except ZeroDivisionError:
                 percent_rec = "N/A"
         percent_rec_dict[str(key)] = percent_rec
